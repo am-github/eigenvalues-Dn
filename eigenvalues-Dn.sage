@@ -2,11 +2,7 @@ d7=load("d7.sobj")
 d5=load("d5.sobj")
 d3=load("d3.sobj")
 d1=load("d1.sobj")
-d38=load("d38.sobj")
-t=load("t.sobj")
-
-def tau(n):
-    return t[n]
+d83=load("d83.sobj")
 
 def rep(n,x):
     if n==7:
@@ -82,7 +78,7 @@ def CE8(n,D): #the Fourier coefficients C(D,r) of E_{8,D_n,0} for any r in Z and
 
 def C8(n,D):  #the Fourier coefficients C(D,r) of the cusp form of weight 8 for the lattice D_n for any r in Z^n if n!=3 and r=0 otherwise
     if n==3:
-        return d38[-D]
+        return d83[-D]
     sum = CE4(n,D)-CE8(n,D)*24**2/((8-n)*(12-n))
     for i in range (1,-D+1):
             sum=sum+240*sigma(i,3)*CE4(n,D+i)
