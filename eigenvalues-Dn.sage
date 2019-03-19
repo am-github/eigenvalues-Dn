@@ -35,10 +35,10 @@ def repminodd(k,D,r):
     rk = gp('s')
     return ZZ(rk)
 
-def CE4(n,D): #the Fourier coefficients C(D,r) of the Eisenstein series of weight 4 for D_n for any r in Z
+def CE4(n,D): #the Fourier coefficients C(D,r) of the Eisenstein series of weight 4 for D_n for any r in Z^n
 	return rep(8-n,-2*D)
 
-def CTE4(n,l,D): #the Fourier coefficients C(D,r) of T(l)E_{4,D_n,0} for any r in Z and D coprime to l
+def CTE4(n,l,D): #the Fourier coefficients C(D,r) of T(l)E_{4,D_n,0} for any r in Z^n and D coprime to l
     if l!=1 and gcd(D,l)>1:
         raise ValueError('the variable is not coprime to l!')
     if l%2==0:
@@ -51,13 +51,13 @@ def CTE4(n,l,D): #the Fourier coefficients C(D,r) of T(l)E_{4,D_n,0} for any r i
 def lE4(n,l,D): #the eigenvalue of E_{4,D_n,0} for T(l)
     return CTE4(n,l,D)/CE4(n,D)
 
-def CE6(n,D): #the Fourier coefficients C(D,r) of the Eisenstein series of weight 6 for D_n for any r in Z
+def CE6(n,D): #the Fourier coefficients C(D,r) of the Eisenstein series of weight 6 for D_n for any r in Z^n
     sum =-(D+(8-n)/24)*CE4(n,D)
     for i in xrange(1,-D+1):
         sum=sum+(8-n)*sigma(i,1)*CE4(n,D+i)
     return sum
 
-def CTE6(n,l,D): #the Fourier coefficients C(D,r) of T(l)E_{6,D_n,0} for any r in Z and D coprime to l
+def CTE6(n,l,D): #the Fourier coefficients C(D,r) of T(l)E_{6,D_n,0} for any r in Z^n and D coprime to l
     if l!=1 and gcd(D,l)>1:
         raise ValueError('the variable is not coprime to l!')
     if l%2==0:
@@ -70,7 +70,7 @@ def CTE6(n,l,D): #the Fourier coefficients C(D,r) of T(l)E_{6,D_n,0} for any r i
 def lE6(n,l,D): #the eigenvalue of E_{6,D_n,0} for T(l)
     return CTE6(n,l,D)/CE6(n,D)
 
-def CE8(n,D): #the Fourier coefficients C(D,r) of E_{8,D_n,0} for any r in Z and D coprime to l
+def CEis8(n,D): #the Fourier coefficients C(D,r) of E_{8,D_n,0} for any r in Z^n and D coprime to l
     sum =-(D+(12-n)/24)*CE6(n,D)
     for i in xrange(1,-D+1):
         sum=sum+(12-n)*sigma(i,1)*CE6(n,D+i)
@@ -79,12 +79,12 @@ def CE8(n,D): #the Fourier coefficients C(D,r) of E_{8,D_n,0} for any r in Z and
 def C8(n,D):  #the Fourier coefficients C(D,r) of the cusp form of weight 8 for the lattice D_n for any r in Z^n if n!=3 and r=0 otherwise
     if n==3:
         return d83[-D]
-    sum = CE4(n,D)-CE8(n,D)*24**2/((8-n)*(12-n))
+    sum = CE4(n,D)-CEis8(n,D)*24**2/((8-n)*(12-n))
     for i in range (1,-D+1):
             sum=sum+240*sigma(i,3)*CE4(n,D+i)
     return sum
 
-def CT8(n,l,D): #the Fourier coefficients C(D,r) of T(l)phi_8 for any D coprime to l if n!=3 and C(D,0) otherwise
+def CT8(n,l,D): #the Fourier coefficients C(D,r) of T(l)phi_8 for any r in Z^n and any D coprime to l if n!=3 and C(D,0) otherwise
     if l!=1 and gcd(D,l)>1:
         raise ValueError('the variable is not coprime to l!')
     if l%2==0:
@@ -116,7 +116,79 @@ def CT10(n,l,D): #the Fourier coefficients C(D,r) of T(l)phi_{10} for any D copr
 def l10(n,l,D): #the eigenvalue of phi_{10} for T(l)
     return CT10(n,l,D)/C10(n,D)
 
-def Cbeta1(D): #the Fourier coefficients C(D,r) of the cusp form beta_1 of weight 12 for D_3 for any r in Z^3
+def CB121(n,D): #the Fourier coefficients C(D,r) of the cusp form B_{12,n}^1 of weight 12 for D_n for any r in Z
+    sum=CE4(n,D)-CEis8(n,D)*576/((12-n)*(8-n))
+    for i in xrange(1,-D+1):
+        sum=sum+480*CE4(n,D+i)*sigma(i,7)-240*CEis8(n,D+i)*sigma(i,3)*576/((12-n)*(8-n))
+    return sum
+
+def CB122(n,D): #the Fourier coefficients C(D,r) of the cusp form B_{12,n}^2 of weight 12 for D_1 for any r in Z
+    sum=CE6(n,D)+CEis8(n,D)*24/(12-n)
+    for i in xrange(1,-D+1):
+        sum=sum-504*CE6(n,D+i)*sigma(i,5)+240*CEis8(n,D+i)*sigma(i,3)*24/(12-n)
+    return sum
+
+def CTB121(n,l,D): #the Fourier coefficients C(D,r) of T(l)B_{12,n}^1 for any r in Z and D coprime to l
+    if l!=1 and gcd(D,l)>1:
+        raise ValueError('the variable is not coprime to l!')
+    if l%2==0:
+        raise ValueError('l is not coprime to the level!')
+    sum=0
+    for i in l.divisors():
+        sum=sum+kronecker((-1)**((n-1)/2)*D*8,i)*CB121(n,D*l**2/i**2)*i**(11-(n+1)/2)
+    return sum
+
+def CTB122(n,l,D): #the Fourier coefficients C(D,r) of T(l)B_{12,n}^2 for any r in Z and D coprime to l
+    if l!=1 and gcd(D,l)>1:
+        raise ValueError('the variable is not coprime to l!')
+    if l%2==0:
+        raise ValueError('l is not coprime to the level!')
+    sum=0
+    for i in l.divisors():
+        sum=sum+kronecker((-1)**((n-1)/2)*D*8,i)*CB122(n,D*l**2/i**2)*i**(11-(n+1)/2)
+    return sum
+
+def T12(n,l): #the matrix of T(l) on B121(n) and B122(n)
+    G = matrix([[CB121(n,-1),CB122(n,-1)],[CB121(n,-2),CB122(n,-2)]])
+    VB121 = matrix([[CTB121(n,l,-1)],[CTB121(n,l,-2)]])
+    GB121 = G.inverse()*VB121
+    VB122 = matrix([[CTB122(n,l,-1)],[CTB122(n,l,-2)]])
+    GB122 = G.inverse()*VB122
+    return matrix([[GB121[0,0],GB121[1,0]],[GB122[0,0],GB122[1,0]]])
+
+def Cpsi12(D): # Fourier coefficients C(D,0) of the first Hecke eigenform in J_{12,D_1}, computed by diagonalizing T(3)
+    return -CB121(1,D)*6/319+CB122(1,D)*1440/2233
+
+def CTpsi12(l,D): #the Fourier coefficients C(D,0) of T(l)psi_{12} for any D coprime to l
+    if l!=1 and gcd(D,l)>1:
+        raise ValueError('the variable is not coprime to l!')
+    if l%2==0:
+        raise ValueError('l is not coprime to the level!')
+    sum=0
+    for i in l.divisors():
+        sum=sum+Cpsi12(D*l**2/i**2)*kronecker((-1)**((1-1)/2)*D*8,i)*i**(11-(1+1)/2)
+    return sum
+
+def lpsi12(l,D): #the eigenvalue of psi_{12} for T(l)
+    return CTpsi12(l,D)/Cpsi12(D)
+
+def Calp12(D): # Fourier coefficients C(D,0) of the second Hecke eigenform in J_{12,D_1}, computed by diagonalizing T(3)
+    return CB121(1,D)*325/319-CB122(1,D)*1440/2233
+
+def CTalp12(l,D): #the Fourier coefficients C(D,0) of T(l)alpha_{12} for any D coprime to l
+    if l!=1 and gcd(D,l)>1:
+        raise ValueError('the variable is not coprime to l!')
+    if l%2==0:
+        raise ValueError('l is not coprime to the level!')
+    sum=0
+    for i in l.divisors():
+        sum=sum+Calp12(D*l**2/i**2)*kronecker((-1)**((1-1)/2)*D*8,i)*i**(11-(1+1)/2)
+    return sum
+
+def lalp12(l,D): #the eigenvalue of alpha_{12} for T(l)
+    return CTalp12(l,D)/Calp12(D)
+
+def CB1231(D): #the Fourier coefficients C(D,r) of the cusp form B_{12,3}^1 of weight 12 for D_3 for any r in Z^3
     sum=-D*CE4(3,D)
     for i in xrange(1,-D+1):
         sum=sum+(5*sigma(i,1)+100*sigma(i,7)+504*sigma(i,5)*(D+i+5/24))*CE4(3,D+i)
@@ -124,42 +196,42 @@ def Cbeta1(D): #the Fourier coefficients C(D,r) of the cusp form beta_1 of weigh
             sum=sum-2520*sigma(i,5)*sigma(j,1)*CE4(3,D+i+j)
     return sum
 
-def CTbeta1(l,D): #the Fourier coefficients C(D,r) of T(l)beta_1 for any r in Z^3 and D coprime to l
-    if l!=1 and gcd(D,l)>1:
-        raise ValueError('the variable is not coprime to l!')
-    if l%2==0:
-        raise ValueError('l is not coprime to the level!')
-    sum=0
-    for i in l.divisors():
-        sum=sum+kronecker((-D)*8,i)*(i**9)*Cbeta1(D*l**2/i**2)
-    return sum
-
-def Cbeta2(D): #the Fourier coefficients C(D,0) of the cusp form beta_2 of weight 12 for D_3
+def CB1232(D): #the Fourier coefficients C(D,0) of the cusp form B_{12,3}^2 of weight 12 for D_3
     sum=C8(3,D)
     for i in xrange(1,-D):
         sum=sum+240*sigma(i,3)*C8(3,D+i)
     return sum
 
-def CTbeta2(l,D): #the Fourier coefficients C(D,0) of T(l)beta_2 for any D coprime to l
+def CTB1231(l,D): #the Fourier coefficients C(D,r) of T(l)B_{12,3}^1 for any r in Z^3 and D coprime to l
     if l!=1 and gcd(D,l)>1:
         raise ValueError('the variable is not coprime to l!')
     if l%2==0:
         raise ValueError('l is not coprime to the level!')
     sum=0
     for i in l.divisors():
-        sum=sum+kronecker((-D)*8,i)*Cbeta2(D*l**2/i**2)*i**9
+        sum=sum+kronecker((-D)*8,i)*(i**9)*CB1231(D*l**2/i**2)
     return sum
 
-def T3(l): #the matrix of T(l) on J_{12,D_3}
-    G = matrix([[Cbeta1(-1),Cbeta2(-1)],[Cbeta1(-2),Cbeta2(-2)]])
-    Vbeta1 = matrix([[CTbeta1(l,-1)],[CTbeta1(l,-2)]])
-    Gbeta1 = G.inverse()*Vbeta1
-    Vbeta2 = matrix([[CTbeta2(l,-1)],[CTbeta2(l,-2)]])
-    Gbeta2 = G.inverse()*Vbeta2
-    return matrix([[Gbeta1[0,0],Gbeta1[1,0]],[Gbeta2[0,0],Gbeta2[1,0]]])
+def CTB1232(l,D): #the Fourier coefficients C(D,0) of T(l)B_{12,3}^2 for any D coprime to l
+    if l!=1 and gcd(D,l)>1:
+        raise ValueError('the variable is not coprime to l!')
+    if l%2==0:
+        raise ValueError('l is not coprime to the level!')
+    sum=0
+    for i in l.divisors():
+        sum=sum+kronecker((-D)*8,i)*CB1232(D*l**2/i**2)*i**9
+    return sum
+
+def T123(l): #the matrix of T(l) on F_1 and F_2
+    G = matrix([[CB1231(-1),CB1232(-1)],[CB1231(-2),CB1232(-2)]])
+    VB1231 = matrix([[CTB1231(l,-1)],[CTB1231(l,-2)]])
+    GB1231 = G.inverse()*VB1231
+    VB1232 = matrix([[CTB1232(l,-1)],[CTB1232(l,-2)]])
+    GB1232 = G.inverse()*VB1232
+    return matrix([[GB1231[0,0],GB1231[1,0]],[GB1232[0,0],GB1232[1,0]]])
 
 def CPsi12(D): # Fourier coefficients C(D,0) of the first Hecke eigenform in J_{12,D_3}, computed by diagonalizing T(3)
-    return 2/9*Cbeta1(D)+35/9*Cbeta2(D)
+    return 2/9*CB1231(D)+35/9*CB1232(D)
 
 def CTPsi12(l,D): #the Fourier coefficients C(D,0) of T(l)Psi_{12} for any D coprime to l
     if l!=1 and gcd(D,l)>1:
@@ -174,21 +246,85 @@ def CTPsi12(l,D): #the Fourier coefficients C(D,0) of T(l)Psi_{12} for any D cop
 def lPsi12(l,D): #the eigenvalue of Psi_{12} for T(l)
     return CTPsi12(l,D)/CPsi12(D)
 
-def Cvp12(D): # Fourier coefficients C(D,0) of the second Hecke eigenform in J_{12,D_3}, computed by diagonalizing T(3)
-    return 7/9*Cbeta1(D)-35/9*Cbeta2(D)
+def CA12(D): # Fourier coefficients C(D,0) of the second Hecke eigenform in J_{12,D_3}, computed by diagonalizing T(3)
+    return 7/9*CB1231(D)-35/9*CB1232(D)
 
-def CTvp12(l,D): #the Fourier coefficients C(D,0) of T(l)varphi_{12} for any D coprime to l
+def CTA12(l,D): #the Fourier coefficients C(D,0) of T(l)A_{12} for any D coprime to l
     if l!=1 and gcd(D,l)>1:
         raise ValueError('the variable is not coprime to l!')
     if l%2==0:
         raise ValueError('l is not coprime to the level!')
     sum=0
     for i in l.divisors():
-        sum=sum+kronecker((-D)*8,i)*Cvp12(D*l**2/i**2)*i**9
+        sum=sum+kronecker((-D)*8,i)*CA12(D*l**2/i**2)*i**9
     return sum
 
-def lvp12(l,D): #the eigenvalue of varphi_{12} for T(l)
-    return CTvp12(l,D)/Cvp12(D)
+def lA12(l,D): #the eigenvalue of A_{12} for T(l)
+    return CTA12(l,D)/CA12(D)
+
+def Cphi12(D): # Fourier coefficients C(D,0) of the first Hecke eigenform in J_{12,D_5}, computed by diagonalizing T(3)
+    return CB121(5,D)*13/63-CB122(5,D)*80/189
+
+def CTphi12(l,D): #the Fourier coefficients C(D,0) of T(l)phi_{12} for any D coprime to l
+    if l!=1 and gcd(D,l)>1:
+        raise ValueError('the variable is not coprime to l!')
+    if l%2==0:
+        raise ValueError('l is not coprime to the level!')
+    sum=0
+    for i in l.divisors():
+        sum=sum+Cphi12(D*l**2/i**2)*kronecker((-1)**((5-1)/2)*D*8,i)*i**(11-(5+1)/2)
+    return sum
+
+def lphi12(l,D): #the eigenvalue of phi_{12} for T(l)
+    return CTphi12(l,D)/Cphi12(D)
+
+def Ckap12(D): # Fourier coefficients C(D,0) of the second Hecke eigenform in J_{12,D_5}, computed by diagonalizing T(3)
+    return CB121(5,D)*50/63+CB122(5,D)*80/189
+
+def CTkap12(l,D): #the Fourier coefficients C(D,0) of T(l)kappa_{12} for any D coprime to l
+    if l!=1 and gcd(D,l)>1:
+        raise ValueError('the variable is not coprime to l!')
+    if l%2==0:
+        raise ValueError('l is not coprime to the level!')
+    sum=0
+    for i in l.divisors():
+        sum=sum+Ckap12(D*l**2/i**2)*kronecker((-1)**((5-1)/2)*D*8,i)*i**(11-(5+1)/2)
+    return sum
+
+def lkap12(l,D): #the eigenvalue of kappa_{12} for T(l)
+    return CTkap12(l,D)/Ckap12(D)
+
+def CPhi12(D): # Fourier coefficients C(D,0) of the first Hecke eigenform in J_{12,D_7}, computed by diagonalizing T(3)
+    return 3*CB121(7,D)-CB122(7,D)*432/5
+
+def CTPhi12(l,D): #the Fourier coefficients C(D,0) of T(l)Phi_{12} for any D coprime to l
+    if l!=1 and gcd(D,l)>1:
+        raise ValueError('the variable is not coprime to l!')
+    if l%2==0:
+        raise ValueError('l is not coprime to the level!')
+    sum=0
+    for i in l.divisors():
+        sum=sum+CPhi12(D*l**2/i**2)*kronecker((-1)**((7-1)/2)*D*8,i)*i**(11-(7+1)/2)
+    return sum
+
+def lPhi12(l,D): #the eigenvalue of Phi_{12} for T(l)
+    return CTPhi12(l,D)/CPhi12(D)
+
+def CK12(D): # Fourier coefficients C(D,0) of the second Hecke eigenform in J_{12,D_7}, computed by diagonalizing T(3)
+    return -2*CB121(7,D)+CB122(7,D)*432/5
+
+def CTK12(l,D): #the Fourier coefficients C(D,0) of T(l)K_{12} for any D coprime to l
+    if l!=1 and gcd(D,l)>1:
+        raise ValueError('the variable is not coprime to l!')
+    if l%2==0:
+        raise ValueError('l is not coprime to the level!')
+    sum=0
+    for i in l.divisors():
+        sum=sum+CK12(D*l**2/i**2)*kronecker((-1)**((7-1)/2)*D*8,i)*i**(11-(7+1)/2)
+    return sum
+
+def lK12(l,D): #the eigenvalue of K_{12} for T(l)
+    return CTK12(l,D)/CK12(D)
 
 def Cminodd(n,D,r): #the Fourier coefficients C(D,r) of the cusp form of weight 12-n for the lattice D_n for any r in (1/2+Z)^n
     return repminodd(8-n,D,r)
